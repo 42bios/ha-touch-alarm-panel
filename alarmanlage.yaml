@@ -1,0 +1,152 @@
+substitutions:
+  device_name: alarmanlage
+  friendly_name: Alarmanlage Bedieneinheit
+  # Wichtig: Pins passend zu deinem echten Verdrahtungsplan anpassen.
+  # Bei Ethernet sind RMII-Pins reserviert und nicht frei nutzbar.
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+  min_version: 2025.6.0
+  project:
+    name: local.esp_alarmanlage
+    version: "5.0.0"
+
+esp32:
+  board: esp32-poe-iso
+  framework:
+    type: arduino
+
+logger:
+  baud_rate: 0
+
+# Alle Entities werden ueber die native API an Home Assistant gemeldet.
+# Diese Bedieneinheit enthaelt KEINE Alarmlogik mehr (kein PIN-Check, kein
+# Arm/Disarm-Status, keine Tuerkontakte, keine Sirene) - das laeuft komplett
+# als HA-Automation/Package. Das Board meldet nur rohe Tastendruecke und
+# nimmt LED-Befehle von HA entgegen.
+api:
+
+ota:
+  - platform: esphome
+
+ethernet:
+  type: LAN8720
+  mdc_pin: GPIO23
+  mdio_pin: GPIO18
+  clk_mode: GPIO17_OUT
+  phy_addr: 0
+  power_pin: GPIO12
+
+web_server:
+  port: 80
+
+i2c:
+  sda: GPIO32
+  scl: GPIO33
+  scan: true
+
+# Kapazitiver 12-Kanal-Touchsensor statt mechanischer Taster. Jeder Kanal
+# haengt an einem kleinen Kupferpad hinter der Frontplatte (Acryl/PMMA,
+# ~2-3mm), die Symbole/Ziffern werden nur graviert, nicht durchgeschnitten -
+# die Platte bleibt komplett geschlossen (kein Eindringen von Feuchtigkeit/
+# Staub durch Tasterloecher).
+mpr121:
+  - id: touch_panel
+    address: 0x5A
+
+# 12 Touch-Kanaele (0-9, ARM, DISARM). Kein Matrix-Scan noetig - jeder Kanal
+# ist eine eigene HA-Entity. Die PIN-Logik (Ziffern sammeln, mit Code
+# vergleichen, Lockout) lebt komplett in HA.
+binary_sensor:
+  - platform: mpr121
+    mpr121_id: touch_panel
+    channel: 0
+    name: "${friendly_name} Taste 1"
+
+  - platform: mpr121
+    mpr121_id: touch_panel
+    channel: 1
+    name: "${friendly_name} Taste 2"
+
+  - platform: mpr121
+    mpr121_id: touch_panel
+    channel: 2
+    name: "${friendly_name} Taste 3"
+
+  - platform: mpr121
+    mpr121_id: touch_panel
+    channel: 3
+    name: "${friendly_name} Taste 4"
+
+  - platform: mpr121
+    mpr121_id: touch_panel
+    channel: 4
+    name: "${friendly_name} Taste 5"
+
+  - platform: mpr121
+    mpr121_id: touch_panel
+    channel: 5
+    name: "${friendly_name} Taste 6"
+
+  - platform: mpr121
+    mpr121_id: touch_panel
+    channel: 6
+    name: "${friendly_name} Taste 7"
+
+  - platform: mpr121
+    mpr121_id: touch_panel
+    channel: 7
+    name: "${friendly_name} Taste 8"
+
+  - platform: mpr121
+    mpr121_id: touch_panel
+    channel: 8
+    name: "${friendly_name} Taste 9"
+
+  - platform: mpr121
+    mpr121_id: touch_panel
+    channel: 9
+    name: "${friendly_name} Taste 0"
+
+  - platform: mpr121
+    mpr121_id: touch_panel
+    channel: 10
+    name: "${friendly_name} Taste ARM"
+
+  - platform: mpr121
+    mpr121_id: touch_panel
+    channel: 11
+    name: "${friendly_name} Taste DISARM"
+
+# Kein MCP23017 mehr - Taster laufen ueber den MPR121, und statt einzelner
+# Status-LEDs gibt es jetzt EINE RGB-Kantenbeleuchtung fuer die ganze Platte:
+# 2x RGB-LED (parallel an denselben 3 PWM-Kanaelen) strahlen von einer Kante
+# seitlich ins Acryl ein. Laser-geschnittene Kanten sind glaspoliert genug
+# fuer Totalreflexion, und die Gravur der Ziffern/Symbole streut das Licht
+# bevorzugt dort raus - die Symbole "gluehen" von innen, der Rest der Platte
+# bleibt dunkel. Farbe zeigt den Zustand:
+#   Weiss (kurz)  = Tastendruck-Feedback
+#   Blau (kurz)   = erfolgreich scharf gestellt
+#   Gruen (kurz)  = erfolgreich unscharf gestellt
+#   Rot (blinkend)= Alarm ausgeloest
+# Alles wird von Home Assistant gesteuert (light.turn_on mit rgb_color).
+# Pins: freie, nicht-strapping GPIOs (0/2/12/15 bewusst vermieden).
+output:
+  - platform: ledc
+    pin: GPIO4
+    id: backlight_red
+  - platform: ledc
+    pin: GPIO5
+    id: backlight_green
+  - platform: ledc
+    pin: GPIO16
+    id: backlight_blue
+
+light:
+  - platform: rgb
+    id: panel_backlight
+    name: "${friendly_name} Beleuchtung"
+    red: backlight_red
+    green: backlight_green
+    blue: backlight_blue

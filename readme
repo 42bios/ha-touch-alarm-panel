@@ -1,0 +1,14 @@
+﻿About
+This repository contains a pure input/output "bedieneinheit" (HMI panel) built with ESPHome
+for Home Assistant. It targets an Olimex ESP32-POE-ISO driving an MPR121 capacitive touch
+sensor (12 touch zones: digits 0-9 plus dedicated ARM/DISARM) and an RGB edge-lit backlight
+(2 LEDs shining into the laser-cut acrylic edge, lighting up the engraved symbols instead of
+individual status LEDs). All alarm logic - PIN validation, arm/disarm state, door contacts,
+entry delay, siren, lockout, users - lives in Home Assistant, not on the device.
+Meant to be built into a JUNG LS 990 single-gang cover: the face plate stays fully closed,
+symbols are only laser-engraved over the touch pads, no through-holes anywhere.
+
+Important Notice
+This project was created with the help of AI-assisted development.
+No warranty is provided for correctness, safety, or fitness for production use.
+Use at your own risk.

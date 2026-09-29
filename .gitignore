@@ -1,0 +1,13 @@
+﻿# ESPHome build/output
+.esphome/
+.pioenvs/
+.piolibdeps/
+
+# Local secrets (never commit)
+secrets.yaml
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
