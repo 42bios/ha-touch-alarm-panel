@@ -74,10 +74,6 @@ the switch insert.
   touch carrier PCB. Plan for a deep/rectangular back box, or mount the
   ESP32 module separately (e.g. in a nearby junction box) with only the
   touch wiring and LEDs going through the cover plate.
-- No laser-cut template file in this repo (yet) — grid layout: 3x4 touch
-  zones (11mm pitch) centered in the ~50x50mm LS990 frame opening, plus
-  2 LED positions on the bottom edge for the backlight. Verify all
-  dimensions against your actual LS990 frame/blank cover before cutting.
 
 ## Notes
 - This setup is a robust baseline, but pin mapping is project-specific.
