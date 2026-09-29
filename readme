@@ -7,6 +7,8 @@ individual status LEDs). All alarm logic - PIN validation, arm/disarm state, doo
 entry delay, siren, lockout, users - lives in Home Assistant, not on the device.
 Meant to be built into a JUNG LS 990 single-gang cover: the face plate stays fully closed,
 symbols are only laser-engraved over the touch pads, no through-holes anywhere.
+Status: concept / work in progress - see README.md "Open Questions / Roadmap" for what's
+still undecided (OLED fit, exact touch zone layout, custom PCB, the HA-side package).
 
 Important Notice
 This project was created with the help of AI-assisted development.
