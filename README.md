@@ -40,30 +40,28 @@ logic (delays, users, PINs) is edited in HA instead of reflashed firmware.
 
 ## Hardware / Enclosure
 Designed to fit behind a **JUNG LS 990** single-gang cover frame, mounted
-into a standard flush-mount ("Kaiser") box, with a custom laser-cut face
-plate replacing the switch insert.
+into a standard flush-mount ("Kaiser") box. The face plate is cut to shape
+and its 12 touch symbols are **laser-engraved** (not cut through), replacing
+the switch insert.
 
-- **1 MPR121** (I2C, address `0x5A`) reads 12 capacitive touch channels —
-  no mechanical buttons, no holes in the face plate for digits/symbols.
-  Each channel is wired to a small copper pad on a carrier PCB mounted
-  directly behind the (non-conductive) cover plate.
-- **No MCP23017 anymore.** Status is no longer shown via individual LEDs —
-  instead the whole engraved touch grid is backlit by **2 RGB LEDs edge-lit
-  into the face plate** (parallel, driven from 3 ESP32 PWM pins, no I/O
-  expander needed for that). Laser-cut acrylic edges come out polished
-  enough for total internal reflection, and the engraved symbols scatter
-  light preferentially — so the numbers/ARM/DISARM glow from inside while
-  the rest of the plate stays dark, without needing 12 separate LEDs or any
-  light-blocking structure between zones.
+- **Touch input — 1 MPR121** (I2C, address `0x5A`) reads 12 capacitive touch
+  channels: no mechanical buttons, no holes for digits/symbols. Each channel
+  is wired to a small copper pad on a carrier PCB mounted directly behind
+  the (non-conductive) face plate.
+- **Status backlight — 2 RGB LEDs, edge-lit into the face plate** (wired in
+  parallel, driven from 3 ESP32 PWM pins). Laser-cut acrylic edges come out
+  polished enough for total internal reflection, and the laser-engraved
+  symbols scatter that light preferentially — so the numbers/ARM/DISARM glow
+  from inside while the rest of the plate stays dark. Color conveys state:
   - White (brief) = key press feedback
   - Blue (brief) = armed successfully
   - Green (brief) = disarmed successfully
   - Red (blinking) = alarm triggered
   - All driven from Home Assistant via `light.turn_on` with `rgb_color`.
-- **Front plate stays closed**: the 12 digit/ARM/DISARM symbols are only
-  **engraved**, not cut through — better sealed against dust/moisture, and
-  touch sensitivity works fine through 2-3mm acrylic/PMMA (adjust the
-  MPR121 touch threshold in the ESPHome config if it's too sensitive/numb).
+- **Sealed face**: only the 12 touch symbols are engraved and the LED edge
+  is exposed — no through-holes anywhere else, better sealed against dust/
+  moisture. Touch sensitivity works fine through 2-3mm acrylic/PMMA (adjust
+  the MPR121 touch threshold in the ESPHome config if it's too sensitive/numb).
 - The LED-facing edge of the plate must stay uncovered by the LS990 frame/
   mounting bracket, otherwise no light gets injected — check clearance
   before finalizing which edge the LEDs sit on.
@@ -73,9 +71,9 @@ plate replacing the switch insert.
   NFC (if wanted later) should be its own separate panel.
 - ⚠️ The ESP32-POE-ISO board itself (~65x51mm) plus its RJ45 jack does
   **not** fit inside a standard round flush-mount box together with the
-  button PCB. Plan for a deep/rectangular back box, or mount the ESP32
-  module separately (e.g. in a nearby junction box) with only the button
-  wiring and LEDs going through the cover plate.
+  touch carrier PCB. Plan for a deep/rectangular back box, or mount the
+  ESP32 module separately (e.g. in a nearby junction box) with only the
+  touch wiring and LEDs going through the cover plate.
 - No laser-cut template file in this repo (yet) — grid layout: 3x4 touch
   zones (11mm pitch) centered in the ~50x50mm LS990 frame opening, plus
   2 LED positions on the bottom edge for the backlight. Verify all
