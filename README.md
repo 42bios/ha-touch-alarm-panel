@@ -1,12 +1,12 @@
 # ESPHome Alarm-Bedieneinheit
 
 ## Important Notice
+- Spontaneous side/fun project - an idea that came up on a whim, not a
+  serious product build. Notes here are ongoing considerations, not a
+  build guide.
 - This project was created with the help of AI-assisted development.
 - No warranty is provided for correctness, safety, or production readiness.
 - Use at your own risk.
-- **Status: concept / work in progress.** The architecture (dumb panel,
-  logic in HA) is settled; several hardware details below are still open
-  questions, not final decisions — see "Open Questions / Roadmap".
 
 ## Architecture
 This ESP32 device is a **pure input/output panel (HMI)** — it has **no alarm
@@ -41,47 +41,45 @@ logic (delays, users, PINs) is edited in HA instead of reflashed firmware.
 5. Add the device in Home Assistant and build the arm/disarm/PIN logic there
    (package/automation, not covered by this repo yet).
 
-## Hardware / Enclosure (current direction)
-Fits behind a **JUNG LS 990** single-gang cover frame, mounted into a
-standard flush-mount ("Kaiser") box. The face plate is cut to shape and its
-12 touch symbols are **laser-engraved** (not cut through), replacing the
-switch insert.
+## Enclosure ideas / considerations
+Not a build plan, just where the thinking is at:
 
-- **Touch input — MPR121** (I2C, address `0x5A`) reads 12 capacitive touch
-  channels: no mechanical buttons, no holes for digits/symbols. Each channel
-  is wired to a copper pad behind the (non-conductive) face plate. Exact pad
-  shapes/positions and the carrier PCB layout are still open — see below.
-- **Status backlight — 2 RGB LEDs, edge-lit into the face plate** (wired in
-  parallel, driven from 3 ESP32 PWM pins). Laser-cut acrylic edges come out
-  polished enough for total internal reflection, and the laser-engraved
-  symbols scatter that light preferentially — so the numbers/ARM/DISARM glow
-  from inside while the rest of the plate stays dark. Color conveys state:
-  - White (brief) = key press feedback
-  - Blue (brief) = armed successfully
-  - Green (brief) = disarmed successfully
-  - Red (blinking) = alarm triggered
-  - All driven from Home Assistant via `light.turn_on` with `rgb_color`.
-- The LED-facing edge of the plate must stay uncovered by the LS990 frame/
-  mounting bracket, otherwise no light gets injected — check clearance
-  before finalizing which edge the LEDs sit on.
-- ⚠️ The ESP32-POE-ISO board itself (~65x51mm) plus its RJ45 jack does
-  **not** fit inside a standard round flush-mount box together with the
-  touch carrier PCB. Plan for a deep/rectangular back box, or mount the
-  ESP32 module separately (e.g. in a nearby junction box) with only the
-  touch wiring and LEDs going through the cover plate.
+- Idea: mount it behind a **JUNG LS 990** single-gang cover frame, in a
+  standard flush-mount ("Kaiser") box, with a custom face plate replacing
+  the switch insert — plate cut to shape, 12 touch symbols laser-engraved
+  rather than cut through.
+- Touch: thinking **MPR121** (I2C) for 12 capacitive channels instead of
+  mechanical buttons — no holes needed for digits/symbols, just copper pads
+  behind the face plate. Haven't worked out exact pad shapes/positions or
+  the carrier PCB yet.
+- Backlight idea: 2 RGB LEDs shining edge-on into the face plate instead of
+  individual LEDs per zone. Laser-cut acrylic edges are polished enough for
+  total internal reflection, and the engraved symbols would scatter that
+  light out — so the numbers/ARM/DISARM could glow from inside while the
+  rest of the plate stays dark. Color would carry the status:
+  - white (brief) = key press feedback
+  - blue (brief) = armed
+  - green (brief) = disarmed
+  - red (blinking) = alarm
+  - all driven from Home Assistant via `light.turn_on` with `rgb_color`
+- Open question to keep in mind: the LED-facing edge would need to stay
+  clear of the LS990 frame/mounting bracket, or no light gets in.
+- Open question to keep in mind: the ESP32-POE-ISO board itself (~65x51mm)
+  plus its RJ45 jack probably won't fit inside a normal round flush-mount
+  box together with the touch carrier PCB — might need a deeper/rectangular
+  back box, or keep the ESP32 module elsewhere and only run touch/LED wiring
+  through the cover plate.
 
 ## Open Questions / Roadmap
-- **OLED**: not decided yet whether one fits at all next to the touch grid
-  in a single LS990 gang, and if so, which size/model — still need to find
-  one that actually fits the available space without crowding the 12 touch
-  zones.
-- **Touch zones**: current 3x4 MPR121 layout (digits + ARM/DISARM) is a
-  starting point, not final — exact zone size/shape/spacing may still change
-  once the enclosure and any OLED placement are settled.
-- **Custom PCB**: combining the MPR121, LED wiring and (if it fits) the OLED
-  onto one small board that matches the final panel layout exactly. This is
-  the natural next step once the above is settled, but not urgent — will
-  happen whenever there's time for it.
+- **OLED**: still an open idea — not decided whether one even fits next to
+  the touch grid in a single LS990 gang, and if so which size/model would
+  actually fit without crowding the 12 touch zones.
+- **Touch zones**: current 3x4 MPR121 layout (digits + ARM/DISARM) is just
+  a starting point, not final — could still change once the enclosure and
+  any OLED placement are settled.
+- **Custom PCB**: combining MPR121, LED wiring and (if it fits) the OLED
+  onto one small board matching the final panel layout. Natural next step
+  once the above settles, but no rush — whenever there's time for it.
 - **Home Assistant package**: the actual alarm logic (PIN handling,
   arm/disarm, door contacts, siren, lockout) — not started yet.
 
